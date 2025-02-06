@@ -72,6 +72,7 @@ data = PandasData(dataname=df)
 
 cerebro = bt.Cerebro()
 cerebro.broker.set_cash(initial_balance)
+cerebro.broker.set_slippage_perc(0.001)
 cerebro.broker.setcommission(commission=0.0005)
 
 print(f'Balance inicial: {cerebro.broker.get_cash()}')

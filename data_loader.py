@@ -6,6 +6,15 @@ from datetime import timedelta
 folder = 'csv'
 os.makedirs(folder, exist_ok=True)
 
+timeframe_mapping = {
+    '1m': 1,
+    '5m': 5,
+    '15m': 15,
+    '1h': 60,
+    '4h': 240,
+    '1d': 1440
+}
+
 def _get_file_name(symbol: str, timeframe):
     pair = symbol.replace('/', '').lower()
     return f'{pair}_{timeframe}.csv'
@@ -32,7 +41,8 @@ def get_chart_data(start_date, end_date, timeframe, symbol):
         df_temp = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
         df_temp['timestamp'] = pd.to_datetime(df_temp['timestamp'], unit='ms')
         all_data.append(df_temp)
-        since = df_temp['timestamp'].iloc[-1] + timedelta(hours=1)
+        minutes = timeframe_mapping.get(timeframe, 60)
+        since = df_temp['timestamp'].iloc[-1] + timedelta(minutes=minutes)
         if since >= pd.to_datetime(end_date):
             break
         since = int(since.timestamp() * 1000)
