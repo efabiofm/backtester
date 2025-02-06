@@ -37,9 +37,9 @@ class EMACrossStrategy(bt.Strategy):
         # Este método se invoca cuando el estado de una orden cambia.
         # if order.status == bt.Order.Completed: # [Canceled, Rejected, Submitted, Accepted]
         #     if order.isbuy():
-        #         print(f"Compra ejecutada: {order.executed.price}")
+        #         print(f'Compra ejecutada: {order.executed.price}')
         #     elif order.issell():
-        #         print(f"Venta ejecutada: {order.executed.price}")
+        #         print(f'Venta ejecutada: {order.executed.price}')
 
     def next(self):
         atr_value = self.atr[0]
@@ -61,28 +61,30 @@ class EMACrossStrategy(bt.Strategy):
                 self.sell_bracket(size=size, limitprice=take_profit, stopprice=stop_loss)
 
 # Setup
+symbol = 'BTC/USDT'
 start_date = '2024-01-01'
 end_date = '2025-01-01'
 timeframe = '1h'
-df = get_chart_data(start_date, end_date, timeframe)
-data = PandasData(dataname=df)
 initial_balance = 10000
+
+df = get_chart_data(start_date, end_date, timeframe, symbol)
+data = PandasData(dataname=df)
 
 cerebro = bt.Cerebro()
 cerebro.broker.set_cash(initial_balance)
 cerebro.broker.setcommission(commission=0.0005)
 
-print(f"Balance inicial: {cerebro.broker.get_cash()}")
+print(f'Balance inicial: {cerebro.broker.get_cash()}')
 
 cerebro.addstrategy(EMACrossStrategy)
-cerebro.addanalyzer(bt.analyzers.DrawDown, _name="drawdown")
+cerebro.addanalyzer(bt.analyzers.DrawDown, _name='drawdown')
 cerebro.adddata(data)
 cerebro.run()
 
 final_value = round(cerebro.broker.get_cash(), 2)
 strategy_returns = round((final_value - initial_balance) / initial_balance * 100, 2)
 
-print(f"Balance final: {final_value}")
-print(f"Rendimiento: {strategy_returns}%")
+print(f'Balance final: {final_value}')
+print(f'Rendimiento: {strategy_returns}%')
 
 cerebro.plot(style='candlestick')
